@@ -5,6 +5,8 @@ import finalAnimation from "../assets/circleSpinner.json";
 import OutputContainer from "./OutputContainer";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
+import axios from "axios";
+import { parseServerResponse } from "./utils/parsing";
 
 function DesignUpload() {
   const [selectedImage, setSelectedImage] = useState(null);
@@ -72,25 +74,14 @@ function DesignUpload() {
   const handleUpload = async () => {
     console.log("sele ctedimae", selectedImage);
     setIsUploading(true);
-    // setTimeout(() => {
-    //   alert("Image uploaded successfully!");
-    //   setIsUploading(false);
-    //   setSelectedImage(null);
-    // }, 3000); // Simulate API call
+
     if (!selectedImage) {
       alert("Please find a file to upload");
       return;
     }
-
-    // const formData = new FormData();
-    // formData.append("image", selectedImage);
-
+    const formData = new FormData();
+    formData.append("image", selectedImage);
     try {
-      // const response = await fetch('/api/process-image', {
-      //     method: 'POST',
-      //     body: formData
-      // })
-
       const responseData = {
         wmMarkup: `<wm-composite name="composite4" show="false">
                 <wm-label class="col-xs-4 control-label" name="label5"></wm-label>
@@ -131,15 +122,22 @@ function DesignUpload() {
     height: 0
 }`,
       };
-      // if (!response.ok) {
+
+      setaiResponse(responseData as any);
+      setIsUploading(false);
+
+      // const response = await axios.post("/api/process-image", formData);
+      // if (response.status !== 200) {
       //   throw new Error("Failed to upload image");
       // }
-      setTimeout(() => {
-        setaiResponse(responseData as any);
-        setIsUploading(false);
-      }, 2000);
-      // const imageBlob = await response.blob();
-      // const imageUrl = URL.createObjectURL(imageBlob);
+      // const { markup, styles } = parseServerResponse(response);
+
+      // console.log("markup,styles are ==>", markup, typeof markup);
+
+      // setTimeout(() => {
+      //   setaiResponse({ markup: `${markup}`,styles: `${styles}`  } as any);
+      //   setIsUploading(false);
+      // }, 2000);
     } catch (error) {
       console.log("Error uploading files:", error);
     }
@@ -159,67 +157,6 @@ function DesignUpload() {
         </div>
       )}
       {!aiResponse ? (
-        // <div className="bg-white shadow-lg p-8 w-full max-w-md relative">
-        //   <h1 className="text-2xl font-semibold text-gray-800 mb-4 text-center">
-        //     Upload an Image
-        //   </h1>
-
-        //   <label
-        //     htmlFor="image-upload"
-        //     className="flex flex-col items-center cursor-pointer"
-        //   >
-        //     <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mb-4 hover:bg-blue-200">
-        //       <svg
-        //         xmlns="http://www.w3.org/2000/svg"
-        //         fill="none"
-        //         viewBox="0 0 24 24"
-        //         strokeWidth={2}
-        //         stroke="currentColor"
-        //         className="w-8 h-8 text-blue-500"
-        //       >
-        //         <path
-        //           strokeLinecap="round"
-        //           strokeLinejoin="round"
-        //           d="M12 4v16m8-8H4"
-        //         />
-        //       </svg>
-        //     </div>
-        //     <span className="text-blue-600">Choose an image</span>
-        //     <input
-        //       type="file"
-        //       id="image-upload"
-        //       className="hidden"
-        //       accept="image/*"
-        //       onChange={handleImageChange}
-        //     />
-        //   </label>
-
-        //   <div className="mt-6">
-        //     <div className="border-2 border-dashed border-gray-300 rounded-lg h-48 flex items-center justify-center bg-gray-50">
-        //       {selectedImage ? (
-        //         <img
-        //           src={selectedImage}
-        //           alt="Preview"
-        //           className="max-h-full max-w-full rounded-md"
-        //         />
-        //       ) : (
-        //         <span className="text-gray-500">No Image Selected</span>
-        //       )}
-        //     </div>
-        //   </div>
-
-        //   <button
-        //     className={`mt-6 w-full py-2 rounded-md text-white transition-colors ${
-        //       !selectedImage || isUploading
-        //         ? "bg-blue-300 cursor-not-allowed"
-        //         : "bg-blue-500 hover:bg-blue-600"
-        //     }`}
-        //     onClick={handleUpload}
-        //     disabled={!selectedImage || isUploading}
-        //   >
-        //     {isUploading ? "Uploading..." : "Upload"}
-        //   </button>
-        // </div>
         <div className="bg-[#2c2c2c] shadow-lg p-8 w-full relative rounded-lg h-screen font-sans">
           <div className="flex flex-col justify-around w-9/12 m-auto ">
             <h1 className="text-2xl font-semibold text-white mb-4 text-center">
