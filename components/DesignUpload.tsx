@@ -1,5 +1,5 @@
 import Lottie from "lottie-react";
-import React, { ChangeEvent, useState } from "react";
+import React, { ChangeEvent, useEffect, useState } from "react";
 import initialAnimation from "../assets/Animation - 1717665713549.json";
 import finalAnimation from "../assets/circleSpinner.json";
 import imageScanAnimation from "../assets/Animation - 1733058871795.json";
@@ -17,6 +17,35 @@ function DesignUpload() {
   const [aiResponse, setaiResponse] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState([]);
   const logoPath = "./";
+  const [isFileExist, setIsFileExist] = useState<boolean>(false);
+
+  const getData = async () => {
+    try{
+      const response = await fetch('api/check-file-exist/', {
+        method: 'get',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if(response.status === 200){
+        setIsFileExist(true);
+        const jsonRes = await response.json();
+        const data = JSON.parse(jsonRes.jsonData);
+        setaiResponse(data as any);
+        return;
+      }
+
+      setIsFileExist(false);
+    }catch(error: any){
+      console.log("error is: ", error)
+      setIsFileExist(false)
+    }
+  }
+
+  useEffect(()=> {
+    getData();
+  }, [])
 
   const languages_i18n = [
     { language: "English", code: "en" },
@@ -30,6 +59,23 @@ function DesignUpload() {
     { language: "Russian", code: "ru" },
     { language: "Hindi", code: "hi" },
   ];
+
+  const handleReUploadClick = async () =>{
+    try{
+      const response = await fetch('api/delete-file', {
+        method: 'post',
+        headers: {
+          'Content-type': 'application/json'
+        }
+      });
+      if(response.status === 200) {
+        setIsFileExist(false);
+        setaiResponse("");
+      }
+    } catch(error) {
+      console.log("error is: ", error)
+    }
+  }
 
   const handleSelectChange = (e) => {
     const selectedOptions = Array.from(e.target.selectedOptions).map(
@@ -162,6 +208,16 @@ function DesignUpload() {
         setIsUploading(false);
       }, 2000);
 
+      await fetch('api/create-file', {
+        method: 'post',
+        body: JSON.stringify({
+          data: responseData
+        }),
+        headers: {
+          'Content-type': 'application.json'
+        }
+      })
+
       // const response = await axios.post("/api/process-image", formData);
       // if (response.status !== 200) {
       //   throw new Error("Failed to upload image");
@@ -192,20 +248,12 @@ function DesignUpload() {
           />
         </div>
       )}
-      {!aiResponse ? (
-        <div className="bg-[#2c2c2c] shadow-lg p-8 w-full relative rounded-lg h-screen font-sans overflow-scroll">
-          <div className="flex flex-col w-9/12 m-auto ">
-            <div className="flex justify-center mb-7">
-              <img
-                src={"assets/PicToRealLogoHighResDarkBG.png"}
-                height={150}
-                width={150}
-              />
-            </div>
-
-            {/* <h1 className="text-2xl font-semibold text-white mb-4 text-center">
+      {!aiResponse && !isFileExist ? (
+        <div className="bg-[#2c2c2c] shadow-lg p-8 w-full relative rounded-lg h-screen font-sans">
+          <div className="flex flex-col justify-around w-9/12 m-auto ">
+            <h1 className="text-2xl font-semibold text-white mb-4 text-center">
               Upload your design
-            </h1> */}
+            </h1> 
 
             {/* Image Upload Zone */}
             <label
@@ -309,6 +357,14 @@ function DesignUpload() {
               </div>
             </TabPanel>
           </Tabs>
+          <button
+            className={`mt-6 w-full py-2 rounded-md text-white transition-colors ${
+              !selectedImage || isUploading
+                ? "bg-blue-600"
+                : "bg-blue-500 hover:bg-blue-600"
+            }`}
+            onClick={handleReUploadClick}
+          >Re upload</button>
         </div>
       )}
     </div>
