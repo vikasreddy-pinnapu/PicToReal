@@ -2,17 +2,21 @@ import Lottie from "lottie-react";
 import React, { ChangeEvent, useState } from "react";
 import initialAnimation from "../assets/Animation - 1717665713549.json";
 import finalAnimation from "../assets/circleSpinner.json";
+import imageScanAnimation from "../assets/Animation - 1733058871795.json";
 import OutputContainer from "./OutputContainer";
 import { Tab, TabList, TabPanel, Tabs } from "react-tabs";
 import "react-tabs/style/react-tabs.css";
 import axios from "axios";
 import { parseServerResponse } from "./utils/parsing";
+import I18nDownloader from "./I18nDownloader";
+import PicToReal from "../public/assets/PicToRealLogoHighResDarkBG.png";
 
 function DesignUpload() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isUploading, setIsUploading] = useState(false);
   const [aiResponse, setaiResponse] = useState("");
   const [selectedLanguages, setSelectedLanguages] = useState([]);
+  const logoPath = "./";
 
   const languages_i18n = [
     { language: "English", code: "en" },
@@ -121,10 +125,42 @@ function DesignUpload() {
 .app-tabbar{
     height: 0
 }`,
+        i18n: {
+          en: {
+            messages: {},
+            formats: {
+              date: "MMM d, y",
+              time: "h:mm:ss a",
+              currency: "USD",
+            },
+            files: {
+              angular: "en",
+              fullCalendar: null,
+              moment: null,
+            },
+            prefabMessages: {},
+          },
+          ar: {
+            messages: {},
+            formats: {
+              date: "dd‏/MM‏/y",
+              time: "h:mm:ss a",
+              currency: "USD",
+            },
+            files: {
+              angular: "ar",
+              fullCalendar: "ar",
+              moment: "ar",
+            },
+            prefabMessages: {},
+          },
+        },
       };
 
-      setaiResponse(responseData as any);
-      setIsUploading(false);
+      setTimeout(() => {
+        setaiResponse(responseData as any);
+        setIsUploading(false);
+      }, 2000);
 
       // const response = await axios.post("/api/process-image", formData);
       // if (response.status !== 200) {
@@ -149,7 +185,7 @@ function DesignUpload() {
       {isUploading && (
         <div className="absolute inset-0 bg-white bg-opacity-50 flex items-center justify-center z-10">
           <Lottie
-            animationData={finalAnimation}
+            animationData={imageScanAnimation}
             loop={true}
             autoplay={true}
             className="w-48 h-48"
@@ -157,11 +193,19 @@ function DesignUpload() {
         </div>
       )}
       {!aiResponse ? (
-        <div className="bg-[#2c2c2c] shadow-lg p-8 w-full relative rounded-lg h-screen font-sans">
-          <div className="flex flex-col justify-around w-9/12 m-auto ">
-            <h1 className="text-2xl font-semibold text-white mb-4 text-center">
+        <div className="bg-[#2c2c2c] shadow-lg p-8 w-full relative rounded-lg h-screen font-sans overflow-scroll">
+          <div className="flex flex-col w-9/12 m-auto ">
+            <div className="flex justify-center mb-7">
+              <img
+                src={"assets/PicToRealLogoHighResDarkBG.png"}
+                height={150}
+                width={150}
+              />
+            </div>
+
+            {/* <h1 className="text-2xl font-semibold text-white mb-4 text-center">
               Upload your design
-            </h1>
+            </h1> */}
 
             {/* Image Upload Zone */}
             <label
@@ -190,7 +234,9 @@ function DesignUpload() {
                     </button>
                   </div>
                 ) : (
-                  <span className="text-gray-400">Drop or Choose an Image</span>
+                  <span className="text-gray-400 font-bold">
+                    Select or Drop a Design
+                  </span>
                 )}
               </div>
               <input
@@ -245,7 +291,7 @@ function DesignUpload() {
             <TabList>
               <Tab>Markup</Tab>
               <Tab>Styles</Tab>
-              <Tab>i18n</Tab>
+              {aiResponse.i18n && <Tab>i18n</Tab>}
             </TabList>
 
             <TabPanel>
@@ -258,7 +304,9 @@ function DesignUpload() {
               <OutputContainer heading={"Styles"} content={aiResponse.styles} />
             </TabPanel>
             <TabPanel>
-              <div> json</div>
+              <div>
+                <I18nDownloader i18nData={aiResponse.i18n} />
+              </div>
             </TabPanel>
           </Tabs>
         </div>
