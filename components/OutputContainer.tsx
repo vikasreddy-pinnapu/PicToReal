@@ -19,7 +19,7 @@ export default function OutputContainer({ heading, content }) {
   }
   return (
     <>
-      <div className="bg-gray-900 flex justify-between items-center text-gray-300 rounded-t-lg">
+      <div className="bg-gray-900 flex justify-between items-center text-gray-300 rounded-t-lg mt-7">
         <p className=" py-3 px-4 font-sans text-xs">{heading} :</p>
         {copyButtonFlag ? (
           <button
