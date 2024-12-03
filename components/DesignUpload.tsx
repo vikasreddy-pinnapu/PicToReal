@@ -20,15 +20,15 @@ function DesignUpload() {
   const [isFileExist, setIsFileExist] = useState<boolean>(false);
 
   const getData = async () => {
-    try{
-      const response = await fetch('api/check-file-exist/', {
-        method: 'get',
+    try {
+      const response = await fetch("api/check-file-exist/", {
+        method: "get",
         headers: {
-          'Content-Type': 'application/json'
-        }
+          "Content-Type": "application/json",
+        },
       });
 
-      if(response.status === 200){
+      if (response.status === 200) {
         setIsFileExist(true);
         const jsonRes = await response.json();
         const data = JSON.parse(jsonRes.jsonData);
@@ -37,15 +37,15 @@ function DesignUpload() {
       }
 
       setIsFileExist(false);
-    }catch(error: any){
-      console.log("error is: ", error)
-      setIsFileExist(false)
+    } catch (error: any) {
+      console.log("error is: ", error);
+      setIsFileExist(false);
     }
-  }
+  };
 
-  useEffect(()=> {
+  useEffect(() => {
     getData();
-  }, [])
+  }, []);
 
   const languages_i18n = [
     { language: "English", code: "en" },
@@ -60,22 +60,23 @@ function DesignUpload() {
     { language: "Hindi", code: "hi" },
   ];
 
-  const handleReUploadClick = async () =>{
-    try{
-      const response = await fetch('api/delete-file', {
-        method: 'post',
+  const handleReUploadClick = async () => {
+    try {
+      const response = await fetch("api/delete-file", {
+        method: "post",
         headers: {
-          'Content-type': 'application/json'
-        }
+          "Content-type": "application/json",
+        },
       });
-      if(response.status === 200) {
+      if (response.status === 200) {
         setIsFileExist(false);
         setaiResponse("");
+        setSelectedImage(null);
       }
-    } catch(error) {
-      console.log("error is: ", error)
+    } catch (error) {
+      console.log("error is: ", error);
     }
-  }
+  };
 
   const handleSelectChange = (e) => {
     const selectedOptions = Array.from(e.target.selectedOptions).map(
@@ -133,44 +134,44 @@ function DesignUpload() {
     formData.append("image", selectedImage);
     try {
       const responseData = {
-        wmMarkup: `<wm-composite name="composite4" show="false">
-                <wm-label class="col-xs-4 control-label" name="label5"></wm-label>
-                <wm-container class="col-xs-8" name="container4">
-                    <wm-slider name="slider3" on-change="slider3Change($event, widget, newVal, oldVal)"></wm-slider>
-                </wm-container>
-            </wm-composite>
-            <wm-composite name="composite2" show="false">
-                <wm-label class="col-xs-4 control-label" name="label3"></wm-label>
-                <wm-container class="col-xs-8" name="container2">
-                    <wm-slider name="slider1" range="true" on-change="slider1Change($event, widget, newVal, oldVal)" datatype="dataset" dataset="bind:Variables.staticVariable1.dataSet" datafield="dataValue" displayfield="name"></wm-slider>
-                </wm-container>
-            </wm-composite>`,
+        markup: `<wm-composite name="composite4" show="false">
+                      <wm-label class="col-xs-4 control-label" name="label5"></wm-label>
+                      <wm-container class="col-xs-8" name="container4">
+                          <wm-slider name="slider3" on-change="slider3Change($event, widget, newVal, oldVal)"></wm-slider>
+                      </wm-container>
+                  </wm-composite>
+                  <wm-composite name="composite2" show="false">
+                      <wm-label class="col-xs-4 control-label" name="label3"></wm-label>
+                      <wm-container class="col-xs-8" name="container2">
+                          <wm-slider name="slider1" range="true" on-change="slider1Change($event, widget, newVal, oldVal)" datatype="dataset" dataset="bind:Variables.staticVariable1.dataSet" datafield="dataValue" displayfield="name"></wm-slider>
+                      </wm-container>
+                  </wm-composite>`,
         styles: `.app-dialog{
-    width: 100%;
-    max-height: 100%;
-    height: 100%;
-    border-radius: 0;
-    padding: 0;
-}
-.app-dialogcontent{
-    max-height: 100%;
-   padding: 0;
-}
+          width: 100%;
+          max-height: 100%;
+          height: 100%;
+          border-radius: 0;
+          padding: 0;
+      }
+      .app-dialogcontent{
+          max-height: 100%;
+         padding: 0;
+      }
 
-.app-carousel-content{
-    height: 100vh;
-}
+      .app-carousel-content{
+          height: 100vh;
+      }
 
-.app-carousel-slide{
-    padding:0;
-}
+      .app-carousel-slide{
+          padding:0;
+      }
 
-.app-picture{
-    height: 100%;
-}
-.app-tabbar{
-    height: 0
-}`,
+      .app-picture{
+          height: 100%;
+      }
+      .app-tabbar{
+          height: 0
+      }`,
         i18n: {
           en: {
             messages: {},
@@ -203,20 +204,12 @@ function DesignUpload() {
         },
       };
 
+      // const { markup, styles } = parseServerResponse(responseData);
+      const { markup, styles, i18n } = responseData;
       setTimeout(() => {
-        setaiResponse(responseData as any);
+        setaiResponse({ markup, styles, i18n });
         setIsUploading(false);
-      }, 2000);
-
-      await fetch('api/create-file', {
-        method: 'post',
-        body: JSON.stringify({
-          data: responseData
-        }),
-        headers: {
-          'Content-type': 'application.json'
-        }
-      })
+      }, 3000);
 
       // const response = await axios.post("/api/process-image", formData);
       // if (response.status !== 200) {
@@ -224,12 +217,18 @@ function DesignUpload() {
       // }
       // const { markup, styles } = parseServerResponse(response);
 
-      // console.log("markup,styles are ==>", markup, typeof markup);
+      // setaiResponse({ markup, styles });
+      // setIsUploading(false);
 
-      // setTimeout(() => {
-      //   setaiResponse({ markup: `${markup}`,styles: `${styles}`  } as any);
-      //   setIsUploading(false);
-      // }, 2000);
+      await fetch("api/create-file", {
+        method: "post",
+        body: JSON.stringify({
+          data: { markup, styles, i18n },
+        }),
+        headers: {
+          "Content-type": "application.json",
+        },
+      });
     } catch (error) {
       console.log("Error uploading files:", error);
     }
@@ -251,9 +250,13 @@ function DesignUpload() {
       {!aiResponse && !isFileExist ? (
         <div className="bg-[#2c2c2c] shadow-lg p-8 w-full relative rounded-lg h-screen font-sans">
           <div className="flex flex-col justify-around w-9/12 m-auto ">
-            <h1 className="text-2xl font-semibold text-white mb-4 text-center">
-              Upload your design
-            </h1> 
+            <div className="flex justify-center mb-7">
+              <img
+                src={"assets/PicToRealLogoHighResDarkBG.png"}
+                height={150}
+                width={150}
+              />
+            </div>
 
             {/* Image Upload Zone */}
             <label
@@ -343,18 +346,26 @@ function DesignUpload() {
             </TabList>
 
             <TabPanel>
-              <OutputContainer
-                heading={"Markup"}
-                content={aiResponse.wmMarkup}
-              />
+              <OutputContainer heading={"Markup"} content={aiResponse.markup} />
             </TabPanel>
             <TabPanel>
               <OutputContainer heading={"Styles"} content={aiResponse.styles} />
             </TabPanel>
-            <TabPanel>
+            {/* <TabPanel>
               <div>
                 <I18nDownloader i18nData={aiResponse.i18n} />
               </div>
+            </TabPanel> */}
+            <TabPanel>
+              {aiResponse.i18n &&
+                Object.entries(aiResponse.i18n).map(([key, value]) => {
+                  return (
+                    <OutputContainer
+                      heading={key}
+                      content={JSON.stringify(value, undefined, 2)}
+                    />
+                  );
+                })}
             </TabPanel>
           </Tabs>
           <button
@@ -364,7 +375,9 @@ function DesignUpload() {
                 : "bg-blue-500 hover:bg-blue-600"
             }`}
             onClick={handleReUploadClick}
-          >Re upload</button>
+          >
+            Re upload
+          </button>
         </div>
       )}
     </div>
